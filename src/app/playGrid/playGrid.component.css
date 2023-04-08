@@ -1,0 +1,28 @@
+body {
+    height: 100%;
+    width: 100%;
+}
+
+canvas {
+    /* background-color: #ffff00; */
+    padding: 0;
+    margin: auto;
+    display: block;
+    height: 75vh;
+    width: 75vh;
+    border:4px solid #000000;
+}
+
+.counter{
+    text-align: center;
+    font-family: 'PublicPixel';
+    font-smooth: never;
+    font-size: 24pt;
+}
+
+.title{
+    text-align: center;
+    font-family: 'PublicPixel';
+    font-smooth: never;
+    font-size: 32pt;
+}
