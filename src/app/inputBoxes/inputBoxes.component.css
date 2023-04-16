@@ -1,0 +1,38 @@
+.flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+.inputBox {
+    height: 30px;
+    width: 30px;
+    font-size: 20pt;
+    font-family: 'PublicPixel';
+    text-align: center;
+    margin: 10px;
+    display:inline-block;
+    border-radius: 10px;
+}
+
+.spacer {
+    width: 50px;
+    margin: 10px;
+    display:inline-block;
+}
+
+.button {
+    display: inline-block;
+    padding: 15px 25px;
+    font-size: 24px;
+    font-family: 'PublicPixel';
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #000000;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 15px;
+    margin-left: 50px;
+  }

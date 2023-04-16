@@ -1,6 +1,6 @@
 <body>
     <h1 class="counter"><span style="color: red">P</span>ixel<span style="color: red">G</span>uesser</h1>
-    <canvas #playCanvas width="1024" height="1024">Test</canvas>
-    <h2 class="counter">Score: {{getScore()}}</h2>
-    <button (click)="resolve()">Click me</button>
+    <canvas #playCanvas width="1024" height="1024"></canvas>
+    <h2 class="counter">Score: <span [ngStyle]="{ 'color': scoreColor }">{{getScore()}}</span></h2>
+    <app-inputBoxes (messageEvent)="receiveMessage($event)"></app-inputBoxes>
 </body>

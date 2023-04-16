@@ -1,29 +1,36 @@
-import { Component, ElementRef, OnInit, ViewChild, Injectable } from '@angular/core';
-import { HttpClient, HttpResponse} from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-playGrid',
   templateUrl: './playGrid.component.html',
   styleUrls: ['./playGrid.component.css']
 })
-@Injectable()
+
+
 export class PlayGridComponent implements OnInit {
-  constructor(private http: HttpClient) { }
+  readonly rightGuess: number = 0;
+  readonly wrongGuess: number = 1;
+  readonly wrongGuessOver: number = 2;
+
+  constructor(private http: HttpClient) { };
   context2d: CanvasRenderingContext2D = null!;
   hiddenContext2d: CanvasRenderingContext2D = null!
   readonly popSound: HTMLAudioElement = new Audio();
-  readonly pinkNoise: HTMLAudioElement = new Audio();
+  readonly correctSound: HTMLAudioElement = new Audio();
   readonly pingSound: HTMLAudioElement = new Audio();
   counter: number = 0;
-  readonly setOfPixelElements: Set<PixelElement> = new Set()
+  scoreColor: string = 'black'
+  readonly setOfPixelElements: Set<PixelElement> = new Set();
 
   @ViewChild('playCanvas', { static: true }) playCanvas!: ElementRef;
 
   ngOnInit(): void {
     this.popSound.src = '../assets/PopSound.wav';
     this.popSound.load();
-    this.pinkNoise.src = '../assets/PinkNoise.wav';
-    this.pinkNoise.load();
+    this.correctSound.src = '../assets/Correct.mp3';
+    this.correctSound.load();
     this.pingSound.src = '../assets/PingSound.wav';
     this.pingSound.load();
 
@@ -53,13 +60,13 @@ export class PlayGridComponent implements OnInit {
     this.hiddenContext2d.canvas.width = 1024;
     this.hiddenContext2d.canvas.height = 1024;
 
-    let image : HTMLImageElement=new Image();
-    this.http.get('http://localhost:5000/image?date=' + this.getDateAsStringPreformatted())
-    .subscribe((response:any)=>{
-      const imageDataUrl = 'data:image/jpeg;base64,' + response.image;
-      image.src = imageDataUrl;
+    let image: HTMLImageElement = new Image();
+    this.http.get(environment.apiUrl + 'image?date=' + this.getDateAsStringPreformatted())
+      .subscribe((response: any) => {
+        const imageDataUrl = 'data:image/jpeg;base64,' + response.image;
+        image.src = imageDataUrl;
 
-    }) 
+      })
     image.onload = () => {
       this.hiddenContext2d.drawImage(image, 0, 0);
       this.setOfPixelElements.add(new PixelElement([1, 8], [9, 16], this.context2d, this.hiddenContext2d));
@@ -68,6 +75,17 @@ export class PlayGridComponent implements OnInit {
       this.setOfPixelElements.add(new PixelElement([9, 16], [9, 16], this.context2d, this.hiddenContext2d));
     };
 
+  }
+
+  receiveMessage(event: number) {
+    if (event === this.rightGuess) {
+      this.resolve();
+    } else if (event === this.wrongGuess) {
+      this.counter += 25;
+      this.scoreColor = 'red';
+    } else if (event === this.wrongGuessOver) {
+      this.scoreColor = 'black';
+    }
   }
 
   private getCoordinatesOfEventForCanvas(canvas: HTMLCanvasElement, e: MouseEvent): Array<number> {
@@ -87,7 +105,7 @@ export class PlayGridComponent implements OnInit {
     const year: string = currentDate.getFullYear().toString();
     const month: string = String(currentDate.getMonth() + 1).padStart(2, '0');
     const day: string = String(currentDate.getDate()).padStart(2, '0');
-    return year+'-'+month+'-'+day;
+    return year + '-' + month + '-' + day;
   }
 
   onClickUnpixelate(canvas: HTMLCanvasElement, event: MouseEvent) {
@@ -114,12 +132,8 @@ export class PlayGridComponent implements OnInit {
   }
 
   resolve() {
-    this.http.get('http://localhost:5000/word_info?date=' + this.getDateAsStringPreformatted())
-    .subscribe((response:any)=>{
-      console.log(response.layout)
-    }) 
     this.setOfPixelElements.clear();
-    this.pinkNoise.play();
+    this.correctSound.play();
     requestAnimationFrame(() => this.resolveAnimation(0));
   }
 
@@ -132,8 +146,8 @@ export class PlayGridComponent implements OnInit {
       this.context2d.fillRect(xCoordinate, 0, 8, 1024);
       requestAnimationFrame(() => this.resolveAnimation(xCoordinate + 8));
     } else {
-      this.pinkNoise.pause();
-      this.pinkNoise.currentTime = 0;
+      this.correctSound.pause();
+      this.correctSound.currentTime = 0;
       this.pingSound.play();
     }
 

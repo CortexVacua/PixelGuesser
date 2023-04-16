@@ -1,0 +1,9 @@
+<div class="flex-container">
+    <ng-container *ngFor="let inBox of inputBoxes; let i = index">
+        <input type=text [ngStyle]="{ 'background-color': inputBoxBgColor }" class="inputBox" id="{{'inputBox'+i}}"
+            maxlength="1" [disabled]="isLocked" (keydown)="processAndJumpIfNecessary($event, i)"
+            [(ngModel)]="inputBoxes[i].value">
+        <div *ngIf="inBox.needsSpacer()" class="spacer"></div>
+    </ng-container>
+    <button class="button" (click)="commitGuess()" [disabled]="isLocked">GUESS</button>
+</div>
