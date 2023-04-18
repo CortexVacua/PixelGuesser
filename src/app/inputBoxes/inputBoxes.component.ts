@@ -34,7 +34,7 @@ export class InputBoxesComponent implements OnInit {
         }
       })
 
-    this.buzzer.src = '../assets/Buzzer.mp3';
+    this.buzzer.src = 'assets/Buzzer.mp3';
     this.buzzer.load();
     this.buzzer.addEventListener('ended', () => {
       this.messageEvent.emit(2);

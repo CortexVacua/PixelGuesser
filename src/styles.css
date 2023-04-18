@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
 @font-face {
     font-family: 'PublicPixel';
-    src: url('./assets/PublicPixel-z84yD.ttf');
+    src: url('/assets/PublicPixel-z84yD.ttf');
   }

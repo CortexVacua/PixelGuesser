@@ -3,26 +3,62 @@ body {
     width: 100%;
 }
 
-canvas {
-    /* background-color: #ffff00; */
-    padding: 0;
-    margin: auto;
-    display: block;
-    height: 75vh;
-    width: 75vh;
-    border:4px solid #000000;
+@media (orientation:landscape) {
+    canvas {
+        /* background-color: #ffff00; */
+        padding: 0;
+        margin: auto;
+        display: block;
+        height: 70vh;
+        width: 70vh;
+        border: 4px solid #000000;
+    }
 }
 
-.counter{
-    text-align: center;
-    font-family: 'PublicPixel';
-    font-smooth: never;
-    font-size: 24pt;
+@media (orientation:portrait) {
+    canvas {
+        /* background-color: #ffff00; */
+        padding: 0;
+        margin: auto;
+        display: block;
+        height: 90vw;
+        width: 90vw;
+        border: 4px solid #000000;
+    }
 }
 
-.title{
-    text-align: center;
-    font-family: 'PublicPixel';
-    font-smooth: never;
-    font-size: 32pt;
+@media (orientation:landscape) {
+    .score {
+        text-align: center;
+        font-family: 'PublicPixel';
+        font-size: 6.8vh;
+        margin: 10px;
+    }
+}
+
+@media (orientation:portrait) {
+    .score {
+        text-align: center;
+        font-family: 'PublicPixel';
+        font-size: 8.9vw;
+        margin: 10px;
+    }
+}
+
+@media (orientation:landscape) {
+    .title {
+        text-align: center;
+        font-family: 'PublicPixel';
+        font-size: 5.85vh;
+        margin: 10px;
+    }
+}
+
+@media (orientation:portrait) {
+    .title {
+        text-align: center;
+        font-family: 'PublicPixel';
+        font-size: 7.5vw;
+        margin: 10px;
+    }
 }

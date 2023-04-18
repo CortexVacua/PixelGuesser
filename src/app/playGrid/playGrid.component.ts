@@ -27,11 +27,11 @@ export class PlayGridComponent implements OnInit {
   @ViewChild('playCanvas', { static: true }) playCanvas!: ElementRef;
 
   ngOnInit(): void {
-    this.popSound.src = '../assets/PopSound.wav';
+    this.popSound.src = 'assets/PopSound.wav';
     this.popSound.load();
-    this.correctSound.src = '../assets/Correct.mp3';
+    this.correctSound.src = 'assets/Correct.mp3';
     this.correctSound.load();
-    this.pingSound.src = '../assets/PingSound.wav';
+    this.pingSound.src = 'assets/PingSound.wav';
     this.pingSound.load();
 
 
