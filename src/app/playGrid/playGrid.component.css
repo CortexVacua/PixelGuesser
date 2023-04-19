@@ -31,7 +31,7 @@ body {
 @media (orientation:landscape) {
     .score {
         text-align: center;
-        font-family: 'PublicPixel', 'Arial';
+        font-family: 'PublicPixel', Arial, Helvetica, sans-serif;
         font-size: 6.7vh;
         margin: 10px;
     }
@@ -40,7 +40,7 @@ body {
 @media (orientation:portrait) {
     .score {
         text-align: center;
-        font-family: 'PublicPixel', 'Arial';
+        font-family: 'PublicPixel', Arial, Helvetica, sans-serif;
         font-size: 8.8vw;
         margin: 10px;
     }
@@ -49,7 +49,7 @@ body {
 @media (orientation:landscape) {
     .title {
         text-align: center;
-        font-family: 'PublicPixel', 'Arial';
+        font-family: 'PublicPixel', Arial, Helvetica, sans-serif;
         font-size: 5.75vh;
         margin: 10px;
     }
@@ -58,7 +58,7 @@ body {
 @media (orientation:portrait) {
     .title {
         text-align: center;
-        font-family: 'PublicPixel', 'Arial';
+        font-family: 'PublicPixel', Arial, Helvetica, sans-serif;
         font-size: 7.4vw;
         margin: 10px;
     }
