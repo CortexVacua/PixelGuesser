@@ -1,7 +1,6 @@
 import { environment } from '../../environments/environment';
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { AppComponent } from '../app.component';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
@@ -58,8 +57,8 @@ export class InputBoxesComponent implements OnInit {
   }
   private changeColorBackToWhiteAndUnlock() {
     this.isLocked = false;
-    for (let i = 0; i < this.inputBoxes.length; i++) {
-      this.inputBoxes[i].value = '';
+    for (let inputBox of this.inputBoxes) {
+      inputBox.value = '';
     }
     this.inputBoxBgColor = 'white';
   }
@@ -94,8 +93,8 @@ export class InputBoxesComponent implements OnInit {
 
   commitGuess() {
     let guess: string = '';
-    for (let i = 0; i < this.inputBoxes.length; i++) {
-      const value: string = this.inputBoxes[i].value!;
+    for (let inputBox of this.inputBoxes) {
+      const value: string = inputBox.value;
       if (value && value.length > 0) {
         guess = guess.concat(value);
       }

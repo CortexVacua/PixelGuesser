@@ -10,7 +10,7 @@
     height: 4vh;
     width: 4vh;
     font-size: 3.5vh;
-    font-family: 'PublicPixel';
+    font-family: 'PublicPixel', 'Arial';
     text-align: center;
     margin: 0.5vh;
     display: inline-block;
@@ -23,7 +23,7 @@
     height: 4vw;
     width: 4vw;
     font-size: 3.5vw;
-    font-family: 'PublicPixel';
+    font-family: 'PublicPixel', 'Arial';
     text-align: center;
     margin: 0.5vw;
     display: inline-block;
@@ -52,7 +52,7 @@
     display: inline-block;
     height: 4.5vh;
     font-size: 3.5vh;
-    font-family: 'PublicPixel';
+    font-family: 'PublicPixel', 'Arial';
     cursor: pointer;
     text-align: center;
     text-decoration: none;
@@ -70,7 +70,7 @@
     display: inline-block;
     height: 4.5vw;
     font-size: 3.5vw;
-    font-family: 'PublicPixel';
+    font-family: 'PublicPixel', 'Arial';
     cursor: pointer;
     text-align: center;
     text-decoration: none;
@@ -83,38 +83,38 @@
   }
 }
 
-  @media (orientation:landscape) {
-    .buttonShare {
-      display: inline-block;
-      height: 4.5vh;
-      font-size: 3.5vh;
-      font-family: 'PublicPixel';
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      outline: none;
-      color: #000000;
-      background-color: #1a5edd;
-      border: none;
-      border-radius: 0.5vh;
-      margin-left: 1vh;
-    }
+@media (orientation:landscape) {
+  .buttonShare {
+    display: inline-block;
+    height: 4.5vh;
+    font-size: 3.5vh;
+    font-family: 'PublicPixel', 'Arial';
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #000000;
+    background-color: #1a5edd;
+    border: none;
+    border-radius: 0.5vh;
+    margin-left: 1vh;
   }
+}
 
-  @media (orientation:portrait) {
-    .buttonShare {
-      display: inline-block;
-      height: 4.5vw;
-      font-size: 3.5vw;
-      font-family: 'PublicPixel';
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      outline: none;
-      color: #000000;
-      background-color: #1a5edd;
-      border: none;
-      border-radius: 0.5vw;
-      margin-left: 1vw;
-    }
+@media (orientation:portrait) {
+  .buttonShare {
+    display: inline-block;
+    height: 4.5vw;
+    font-size: 3.5vw;
+    font-family: 'PublicPixel', 'Arial';
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #000000;
+    background-color: #1a5edd;
+    border: none;
+    border-radius: 0.5vw;
+    margin-left: 1vw;
   }
+}

@@ -4,8 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 import { AppComponent } from '../app.component';
 import { InputBoxesComponent } from '../inputBoxes/inputBoxes.component';
-import { application } from 'express';
-
 
 @Component({
   selector: 'app-playGrid',
@@ -15,7 +13,7 @@ import { application } from 'express';
 
 
 export class PlayGridComponent implements OnInit {
-  @ViewChild('childComponent', {static: false}) inputBoxes!: InputBoxesComponent;
+  @ViewChild('childComponent', { static: false }) inputBoxes!: InputBoxesComponent;
   @ViewChild('playCanvas', { static: true }) playCanvas!: ElementRef;
 
   readonly rightGuess: number = 0;
@@ -36,7 +34,7 @@ export class PlayGridComponent implements OnInit {
 
   scoreColor: string = 'black'
   readonly setOfPixelElements: Set<PixelElement> = new Set();
-  
+
   ngOnInit(): void {
     this.popSound.src = 'assets/PopSound.wav';
     this.popSound.load();
@@ -129,11 +127,10 @@ export class PlayGridComponent implements OnInit {
         }
       })
       ementsToSubdivideOrSolve.forEach((pixelElem) => {
-        if (pixelElem.subDivideOrSolve(this.setOfPixelElements)) {
-          this.clicks++;
-          let clonedAudio: HTMLAudioElement = this.popSound.cloneNode(true) as HTMLAudioElement;
-          clonedAudio.play();
-        }
+        pixelElem.subDivideOrSolve(this.setOfPixelElements)
+        this.clicks++;
+        let clonedAudio: HTMLAudioElement = this.popSound.cloneNode(true) as HTMLAudioElement;
+        clonedAudio.play();
       })
     }
   }
@@ -143,7 +140,7 @@ export class PlayGridComponent implements OnInit {
     if (cookieScore) {
       return cookieScore;
     } else {
-      var score: number = (250 - this.clicks! - this.wrongGuesses! * 25);
+      let score: number = (250 - this.clicks - this.wrongGuesses * 25);
       score = score > 0 ? score : 0;
       return score.toString();
     }
@@ -193,7 +190,7 @@ export class PlayGridComponent implements OnInit {
     this.cookieService.set(AppComponent.cookieDate, AppComponent.getDateAsStringPreformatted(), { expires: expiryDate });
     this.cookieService.set(AppComponent.cookieClicks, this.clicks.toString(), { expires: expiryDate });
     if (parseInt(this.getScore()) > 0) {
-      this.cookieService.set(AppComponent.cookieGuesses, (this.wrongGuesses + 1 as number).toString(), { expires: expiryDate });
+      this.cookieService.set(AppComponent.cookieGuesses, (this.wrongGuesses + 1).toString(), { expires: expiryDate });
     } else {
       this.cookieService.set(AppComponent.cookieGuesses, this.wrongGuesses.toString(), { expires: expiryDate });
     }
@@ -213,7 +210,7 @@ class PixelElement {
   readonly visibleContext2d: CanvasRenderingContext2D;
   readonly hiddenContext2d: CanvasRenderingContext2D;
   readonly mapWithCoordinates: Map<string, number>;
-  isSelected: Boolean = false;
+  isSelected: boolean = false;
   fillColor: string;
 
   constructor(xPositionRange: Array<number>, yPositionRange: Array<number>, visibleContext2d: CanvasRenderingContext2D, hiddenContext2d: CanvasRenderingContext2D) {
@@ -244,13 +241,13 @@ class PixelElement {
   }
 
   private getFillColor(): string {
-    var mapWithColors: Map<string, number> = new Map();
-    var r: number = 0;
-    var g: number = 0;
-    var b: number = 0;
+    const mapWithColors: Map<string, number> = new Map();
+    let r: number = 0;
+    let g: number = 0;
+    let b: number = 0;
 
     const pixelData: Uint8ClampedArray = this.hiddenContext2d.getImageData(this.mapWithCoordinates.get(PixelElement.xPositionStartCoordinateKey)!, this.mapWithCoordinates.get(PixelElement.yPositionStartCoordinateKey)!, this.mapWithCoordinates.get(PixelElement.xFillWidthKey)!, this.mapWithCoordinates.get(PixelElement.yFillHeightKey)!).data;
-    var countOfPixels: number = 0;
+    let countOfPixels: number = 0;
     for (let i = 0; i < pixelData.length; i += 4) {
 
       r += Math.pow(pixelData[i], 2);
@@ -267,7 +264,7 @@ class PixelElement {
   }
 
   private static componentToHex(colorValue: number): string {
-    var hex: string = colorValue.toString(16);
+    const hex: string = colorValue.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
   }
 
@@ -281,7 +278,7 @@ class PixelElement {
     return xCoordinatesMatch && yCoordinatesMatch;
   }
 
-  subDivideOrSolve(setOfClickablePixelElements: Set<PixelElement>): boolean {
+  subDivideOrSolve(setOfClickablePixelElements: Set<PixelElement>) {
     if (this.xPositionRange[0] != this.xPositionRange[1]) {
       const xMiddlePosition: number = this.xPositionRange[0] + Math.floor((this.xPositionRange[1] - this.xPositionRange[0]) / 2);
       const yMiddlePosition: number = this.yPositionRange[0] + Math.floor((this.yPositionRange[1] - this.yPositionRange[0]) / 2);
@@ -290,12 +287,10 @@ class PixelElement {
       setOfClickablePixelElements.add(new PixelElement([xMiddlePosition + 1, this.xPositionRange[1]], [yMiddlePosition + 1, this.yPositionRange[1]], this.visibleContext2d, this.hiddenContext2d));
       setOfClickablePixelElements.add(new PixelElement([xMiddlePosition + 1, this.xPositionRange[1]], [this.yPositionRange[0], yMiddlePosition], this.visibleContext2d, this.hiddenContext2d));
       setOfClickablePixelElements.delete(this);
-      return true;
     } else {
       const imageDataToCopy: ImageData = this.hiddenContext2d.getImageData(this.mapWithCoordinates.get(PixelElement.xPositionStartCoordinateKey)!, this.mapWithCoordinates.get(PixelElement.yPositionStartCoordinateKey)!, this.mapWithCoordinates.get(PixelElement.xFillWidthKey)!, this.mapWithCoordinates.get(PixelElement.yFillHeightKey)!);
       this.visibleContext2d.putImageData(imageDataToCopy, this.mapWithCoordinates.get(PixelElement.xPositionStartCoordinateKey)!, this.mapWithCoordinates.get(PixelElement.yPositionStartCoordinateKey)!);
       setOfClickablePixelElements.delete(this);
-      return true;
     }
   }
 
@@ -311,12 +306,4 @@ class PixelElement {
       [PixelElement.yFillHeightKey, heightInPixels]
     ]);;
   }
-}
-
-function getRandomInt(max: number) {
-  return Math.floor(Math.random() * max);
-}
-
-function animateResolving() {
-  throw new Error('Function not implemented.');
 }
