@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -55,7 +54,7 @@ export class AppComponent {
     }
     shareString = shareString.concat('👆[Clicks]:\t\t' + this.cookieService.get(AppComponent.cookieClicks) + '\n');
     shareString = shareString.concat('❔[Guesses]:\t\t' + this.cookieService.get(AppComponent.cookieGuesses) + '\n\n');
-    shareString = shareString.concat('If you want to play PixelGuesser, check it out here: ' + environment.apiUrl)
+    shareString = shareString.concat('If you want to play PixelGuesser, check it out here: ' + document.location.href)
 
     navigator.clipboard.writeText(shareString)
       .then(() => console.log('Text copied to clipboard'))
