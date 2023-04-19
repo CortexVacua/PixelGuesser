@@ -7,3 +7,6 @@
     </ng-container>
     <button class="button" (click)="commitGuess()" [disabled]="isLocked">GUESS</button>
 </div>
+<div class="flex-container" *ngIf="showShareButton">
+    <button class="buttonShare" (click)="shareYourResult()">Share</button>
+</div>

@@ -82,3 +82,39 @@
     margin-left: 1vw;
   }
 }
+
+  @media (orientation:landscape) {
+    .buttonShare {
+      display: inline-block;
+      height: 4.5vh;
+      font-size: 3.5vh;
+      font-family: 'PublicPixel';
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      outline: none;
+      color: #000000;
+      background-color: #1a5edd;
+      border: none;
+      border-radius: 0.5vh;
+      margin-left: 1vh;
+    }
+  }
+
+  @media (orientation:portrait) {
+    .buttonShare {
+      display: inline-block;
+      height: 4.5vw;
+      font-size: 3.5vw;
+      font-family: 'PublicPixel';
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      outline: none;
+      color: #000000;
+      background-color: #1a5edd;
+      border: none;
+      border-radius: 0.5vw;
+      margin-left: 1vw;
+    }
+  }

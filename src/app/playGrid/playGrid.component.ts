@@ -1,6 +1,11 @@
 import { environment } from '../../environments/environment';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { CookieService } from 'ngx-cookie-service';
+import { AppComponent } from '../app.component';
+import { InputBoxesComponent } from '../inputBoxes/inputBoxes.component';
+import { application } from 'express';
+
 
 @Component({
   selector: 'app-playGrid',
@@ -10,22 +15,28 @@ import { HttpClient } from '@angular/common/http';
 
 
 export class PlayGridComponent implements OnInit {
+  @ViewChild('childComponent', {static: false}) inputBoxes!: InputBoxesComponent;
+  @ViewChild('playCanvas', { static: true }) playCanvas!: ElementRef;
+
   readonly rightGuess: number = 0;
   readonly wrongGuess: number = 1;
   readonly wrongGuessOver: number = 2;
+  locked: boolean = false;
 
-  constructor(private http: HttpClient) { };
+  constructor(private http: HttpClient, private cookieService: CookieService, private appComponent: AppComponent) { };
   context2d: CanvasRenderingContext2D = null!;
   hiddenContext2d: CanvasRenderingContext2D = null!
   readonly popSound: HTMLAudioElement = new Audio();
   readonly correctSound: HTMLAudioElement = new Audio();
   readonly pingSound: HTMLAudioElement = new Audio();
-  counter: number = 0;
+  readonly failSound: HTMLAudioElement = new Audio();
+
+  clicks: number = 0;
+  wrongGuesses: number = 0;
+
   scoreColor: string = 'black'
   readonly setOfPixelElements: Set<PixelElement> = new Set();
-
-  @ViewChild('playCanvas', { static: true }) playCanvas!: ElementRef;
-
+  
   ngOnInit(): void {
     this.popSound.src = 'assets/PopSound.wav';
     this.popSound.load();
@@ -33,7 +44,8 @@ export class PlayGridComponent implements OnInit {
     this.correctSound.load();
     this.pingSound.src = 'assets/PingSound.wav';
     this.pingSound.load();
-
+    this.failSound.src = 'assets/FailSound.mp3';
+    this.failSound.load();
 
     const canvas: HTMLCanvasElement = this.playCanvas.nativeElement;
     canvas.addEventListener('click', (e) => {
@@ -61,30 +73,37 @@ export class PlayGridComponent implements OnInit {
     this.hiddenContext2d.canvas.height = 1024;
 
     let image: HTMLImageElement = new Image();
-    this.http.get(environment.apiUrl + 'image?date=' + this.getDateAsStringPreformatted())
+    this.http.get(environment.apiUrl + 'image?date=' + AppComponent.getDateAsStringPreformatted())
       .subscribe((response: any) => {
         const imageDataUrl = 'data:image/jpeg;base64,' + response.image;
         image.src = imageDataUrl;
 
       })
     image.onload = () => {
-      this.hiddenContext2d.drawImage(image, 0, 0);
-      this.setOfPixelElements.add(new PixelElement([1, 8], [9, 16], this.context2d, this.hiddenContext2d));
-      this.setOfPixelElements.add(new PixelElement([1, 8], [1, 8], this.context2d, this.hiddenContext2d));
-      this.setOfPixelElements.add(new PixelElement([9, 16], [1, 8], this.context2d, this.hiddenContext2d));
-      this.setOfPixelElements.add(new PixelElement([9, 16], [9, 16], this.context2d, this.hiddenContext2d));
+      if (this.appComponent.doesCookieExistForToday()) {
+        this.context2d.drawImage(image, 0, 0);
+      } else {
+        this.hiddenContext2d.drawImage(image, 0, 0);
+        this.setOfPixelElements.add(new PixelElement([1, 8], [9, 16], this.context2d, this.hiddenContext2d));
+        this.setOfPixelElements.add(new PixelElement([1, 8], [1, 8], this.context2d, this.hiddenContext2d));
+        this.setOfPixelElements.add(new PixelElement([9, 16], [1, 8], this.context2d, this.hiddenContext2d));
+        this.setOfPixelElements.add(new PixelElement([9, 16], [9, 16], this.context2d, this.hiddenContext2d));
+      }
     };
 
   }
 
   receiveMessage(event: number) {
     if (event === this.rightGuess) {
-      this.resolve();
+      this.resolve(true);
     } else if (event === this.wrongGuess) {
-      this.counter += 25;
+      this.wrongGuesses += 1;
       this.scoreColor = 'red';
+      this.locked = true;
     } else if (event === this.wrongGuessOver) {
       this.scoreColor = 'black';
+      this.locked = false;
+      this.checkIfGameOver();
     }
   }
 
@@ -100,61 +119,86 @@ export class PlayGridComponent implements OnInit {
     return xAndYCoordinates;
   }
 
-  private getDateAsStringPreformatted(): string {
-    const currentDate: Date = new Date();
-    const year: string = currentDate.getFullYear().toString();
-    const month: string = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const day: string = String(currentDate.getDate()).padStart(2, '0');
-    return year + '-' + month + '-' + day;
-  }
-
   onClickUnpixelate(canvas: HTMLCanvasElement, event: MouseEvent) {
-    const xAndYCoordinates: Array<number> = this.getCoordinatesOfEventForCanvas(canvas, event);
-    const ementsToSubdivideOrSolve: Set<PixelElement> = new Set();
-    this.setOfPixelElements.forEach((pixelElem) => {
-      if (pixelElem.isMouseOverElement(xAndYCoordinates)) {
-        ementsToSubdivideOrSolve.add(pixelElem);
-      }
-    })
-    ementsToSubdivideOrSolve.forEach((pixelElem) => {
-      if (pixelElem.subDivideOrSolve(this.setOfPixelElements)) {
-        this.counter++;
-        let clonedAudio: HTMLAudioElement = this.popSound.cloneNode(true) as HTMLAudioElement;
-        clonedAudio.play();
-      }
-    })
+    if (!this.locked) {
+      const xAndYCoordinates: Array<number> = this.getCoordinatesOfEventForCanvas(canvas, event);
+      const ementsToSubdivideOrSolve: Set<PixelElement> = new Set();
+      this.setOfPixelElements.forEach((pixelElem) => {
+        if (pixelElem.isMouseOverElement(xAndYCoordinates)) {
+          ementsToSubdivideOrSolve.add(pixelElem);
+        }
+      })
+      ementsToSubdivideOrSolve.forEach((pixelElem) => {
+        if (pixelElem.subDivideOrSolve(this.setOfPixelElements)) {
+          this.clicks++;
+          let clonedAudio: HTMLAudioElement = this.popSound.cloneNode(true) as HTMLAudioElement;
+          clonedAudio.play();
+        }
+      })
+    }
   }
 
-  getScore(): String {
-    var score: number = (250 - this.counter!);
-    score = score > 0 ? score : 0;
-    return score.toString();
+  getScore(): string {
+    let cookieScore = this.appComponent.getScoreIfItExists();
+    if (cookieScore) {
+      return cookieScore;
+    } else {
+      var score: number = (250 - this.clicks! - this.wrongGuesses! * 25);
+      score = score > 0 ? score : 0;
+      return score.toString();
+    }
   }
 
-  resolve() {
+  private resolve(correct: boolean) {
     this.setOfPixelElements.clear();
-    this.correctSound.play();
-    requestAnimationFrame(() => this.resolveAnimation(0));
+    if (correct) {
+      this.correctSound.play();
+    } else {
+      this.failSound.play();
+    }
+    this.setCookies();
+    requestAnimationFrame(() => this.resolveAnimation(0, correct));
   }
 
-  resolveAnimation(xCoordinate: number) {
+  private checkIfGameOver() {
+    if (this.getScore() === '0') {
+      this.resolve(false);
+      this.inputBoxes.setGameOverIfNecessary(true);
+    } else {
+      this.inputBoxes.setGameOverIfNecessary(false);
+    }
+  }
+
+  private resolveAnimation(xCoordinate: number, correct: boolean) {
     if (xCoordinate < 1025) {
       if (xCoordinate > 0) {
         this.context2d.putImageData(this.hiddenContext2d.getImageData(xCoordinate - 16, 0, 16, 1024), xCoordinate - 16, 0);
       }
       this.context2d.fillStyle = '#FFFFFF'
       this.context2d.fillRect(xCoordinate, 0, 8, 1024);
-      requestAnimationFrame(() => this.resolveAnimation(xCoordinate + 8));
+      requestAnimationFrame(() => this.resolveAnimation(xCoordinate + 8, correct));
     } else {
       this.correctSound.pause();
       this.correctSound.currentTime = 0;
-      this.pingSound.play();
+      if (correct) {
+        this.pingSound.play();
+      }
     }
+  }
 
+  private setCookies() {
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 7);
+    this.cookieService.set(AppComponent.cookieScore, this.getScore(), { expires: expiryDate });
+    this.cookieService.set(AppComponent.cookieDate, AppComponent.getDateAsStringPreformatted(), { expires: expiryDate });
+    this.cookieService.set(AppComponent.cookieClicks, this.clicks.toString(), { expires: expiryDate });
+    if (parseInt(this.getScore()) > 0) {
+      this.cookieService.set(AppComponent.cookieGuesses, (this.wrongGuesses + 1 as number).toString(), { expires: expiryDate });
+    } else {
+      this.cookieService.set(AppComponent.cookieGuesses, this.wrongGuesses.toString(), { expires: expiryDate });
+    }
   }
 }
-
-
 
 class PixelElement {
   static readonly smallestPixelElementWidthInPixels: number = 64;

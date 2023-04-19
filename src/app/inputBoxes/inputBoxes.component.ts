@@ -17,20 +17,34 @@ export class InputBoxesComponent implements OnInit {
   listOfSpacers: Array<number> = [];
   inputBoxes: Array<InputBox> = [];
   isLocked: boolean = false;
+  showShareButton: boolean = false;
   inputBoxBgColor: string = 'white';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private appComponent: AppComponent) { }
 
   @Output() messageEvent = new EventEmitter<number>();
 
   ngOnInit(): void {
     this.http.get(environment.apiUrl + 'word_info?date=' + AppComponent.getDateAsStringPreformatted())
       .subscribe(async (response: any) => {
-        this.listOfSpacers = response.listOfSpacers as Array<number>;
-        const numberOfChars: number = response.numberOfChars;
+        this.listOfSpacers = await response.listOfSpacers as Array<number>;
+        const numberOfChars: number = await response.numberOfChars;
         this.inputBoxes = new Array(numberOfChars);
         for (let i = 0; i < numberOfChars; i++) {
           this.inputBoxes[i] = new InputBox(i, this.listOfSpacers.includes(i) ? true : false);
+        }
+
+        let doesCookieExistForToday: boolean = this.appComponent.doesCookieExistForToday();
+        this.isLocked = doesCookieExistForToday;
+
+        if (doesCookieExistForToday) {
+          if (parseInt(this.appComponent.getScoreIfItExists()!) > 0) {
+            this.inputBoxBgColor = '#9dfab8';
+          } else {
+            this.inputBoxBgColor = '#fa8f87';
+          }
+          this.showShareButton = true;
+          this.filloutSolution();
         }
       })
 
@@ -38,15 +52,25 @@ export class InputBoxesComponent implements OnInit {
     this.buzzer.load();
     this.buzzer.addEventListener('ended', () => {
       this.messageEvent.emit(2);
-      this.changeColorBackToWhiteAndEmptyInputBoxes();
     });
+
+
   }
-  private changeColorBackToWhiteAndEmptyInputBoxes() {
+  private changeColorBackToWhiteAndUnlock() {
     this.isLocked = false;
     for (let i = 0; i < this.inputBoxes.length; i++) {
       this.inputBoxes[i].value = '';
     }
     this.inputBoxBgColor = 'white';
+  }
+
+  setGameOverIfNecessary(gameOver: boolean) {
+    if (gameOver) {
+      this.showShareButton = true;
+      this.filloutSolution();
+    } else {
+      this.changeColorBackToWhiteAndUnlock()
+    }
   }
 
   processAndJumpIfNecessary(event: KeyboardEvent, index: number) {
@@ -82,13 +106,19 @@ export class InputBoxesComponent implements OnInit {
         this.isLocked = true;
         this.inputBoxBgColor = '#9dfab8';
         this.messageEvent.emit(0);
+        this.finish();
       })
+  }
+
+  finish() {
+    this.showShareButton = true;
   }
 
   private handleError(error: HttpErrorResponse) {
     if (error.status == 406) {
       this.messageEvent.emit(1);
       this.startWrongGuessRoutine();
+      throw new Error('Wrong Guess!');
     } else {
       console.error(
         'Backend returned code ${error.status}, ' +
@@ -97,11 +127,26 @@ export class InputBoxesComponent implements OnInit {
     }
   }
 
+  private filloutSolution() {
+    this.http.get(environment.apiUrl + 'solution?date=' + AppComponent.getDateAsStringPreformatted())
+      .subscribe(async (response: any) => {
+        let solution = response.solution as string;
+        if (solution) {
+          for (let i = 0; i < solution.length; i++) {
+            this.inputBoxes[i].value = solution[i];
+          }
+        }
+      })
+  }
+
+  shareYourResult() {
+    this.appComponent.copyShareStringToClipboard();
+  }
+
   private startWrongGuessRoutine() {
     this.isLocked = true;
     this.inputBoxBgColor = '#fa8f87';
     this.buzzer.play()
-    throw new Error('Method not implemented.');
   }
 }
 
