@@ -241,7 +241,6 @@ class PixelElement {
   }
 
   private getFillColor(): string {
-    const mapWithColors: Map<string, number> = new Map();
     let r: number = 0;
     let g: number = 0;
     let b: number = 0;
