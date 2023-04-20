@@ -78,6 +78,7 @@ export class InputBoxesComponent implements OnInit {
         this.commitGuess();
       } else if (event.key === 'Backspace' && (this.inputBoxes[index].value === '' || this.inputBoxes[index].value === null) && index > 0) {
         event.preventDefault();
+        this.inputBoxes[index - 1].value='';
         this.inputBoxes[index - 1].focusOnElement();
       }
     }
