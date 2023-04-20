@@ -44,7 +44,7 @@ export class AppComponent {
     }
   }
 
-  copyShareStringToClipboard() {
+  shareResults() {
     let shareString = 'Daily PixelGuesser [' + this.cookieService.get(AppComponent.cookieDate) + ']: \n\n';
     let score: string = this.cookieService.get(AppComponent.cookieScore);
     if (parseInt(score) > 0) {
@@ -56,9 +56,51 @@ export class AppComponent {
     shareString = shareString.concat('❔[Guesses]:\t\t' + this.cookieService.get(AppComponent.cookieGuesses) + '\n\n');
     shareString = shareString.concat('If you want to play PixelGuesser, check it out here: ' + document.location.href)
 
-    navigator.clipboard.writeText(shareString)
-      .then(() => console.log('Text copied to clipboard'))
-      .catch((error) => console.error('Error copying text: ', error));
+
+    if (this.isUserOnMobile() && navigator.share) {
+      navigator.share({
+        title: "PixelGuesser",
+        text: shareString
+      }).then(() => console.log("Shared result.")).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(shareString)
+        .then(() => {
+          console.log('Text copied to clipboard');
+          this.informAboutResultsBeingCopiedToClipBoard();
+        }).catch(console.error);
+    }
+  }
+
+  private isUserOnMobile(): boolean {
+    if (navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  informAboutResultsBeingCopiedToClipBoard() {
+    const message = document.createElement('div');
+    message.textContent = 'YOUR RESULTS WERE COPIED TO YOUR CLIPBOARD!';
+    message.style.fontFamily = 'PublicPixel, Arial';
+    message.style.position = 'fixed';
+    message.style.top = '50%';
+    message.style.left = '50%';
+    message.style.transform = 'translate(-50%, -50%)';
+    message.style.padding = '10px';
+    message.style.backgroundColor = '#ccc';
+    message.style.borderRadius = '5px';
+    message.style.zIndex = '9999';
+    document.body.appendChild(message);
+    setTimeout(() => {
+      document.body.removeChild(message);
+    }, 2000);
   }
 
 }

@@ -72,21 +72,13 @@ export class InputBoxesComponent implements OnInit {
     }
   }
 
-  processAndJumpIfNecessary(event: KeyboardEvent, index: number) {
+  processEnterAndBackspace(event: KeyboardEvent, index: number) {
     if (!this.isLocked) {
-      event.preventDefault();
       if (event.key === 'Enter') {
         this.commitGuess();
-      } else if (event.key.length === 1) {
-        this.inputBoxes[index].value = event.key;
-        if (index < (this.inputBoxes.length - 1)) {
-          this.inputBoxes[index + 1].focusOnElement();
-        }
-      } else if (event.key == 'Backspace') {
-        this.inputBoxes[index].value = '';
-        if (index > 0) {
-          this.inputBoxes[index - 1].focusOnElement();
-        }
+      } else if (event.key === 'Backspace' && (this.inputBoxes[index].value === '' || this.inputBoxes[index].value === null) && index > 0) {
+        event.preventDefault();
+        this.inputBoxes[index - 1].focusOnElement();
       }
     }
   }
@@ -105,12 +97,8 @@ export class InputBoxesComponent implements OnInit {
         this.isLocked = true;
         this.inputBoxBgColor = '#9dfab8';
         this.messageEvent.emit(0);
-        this.finish();
+        this.showShareButton = true;
       })
-  }
-
-  finish() {
-    this.showShareButton = true;
   }
 
   private handleError(error: HttpErrorResponse) {
@@ -139,7 +127,7 @@ export class InputBoxesComponent implements OnInit {
   }
 
   shareYourResult() {
-    this.appComponent.copyShareStringToClipboard();
+    this.appComponent.shareResults();
   }
 
   private startWrongGuessRoutine() {
@@ -150,12 +138,14 @@ export class InputBoxesComponent implements OnInit {
 }
 
 class InputBox {
-  private _id: string;
+  private _id: number;
+  private _domId: string;
   private _value: string = null!;
   private _needsSpacer: boolean;
 
   constructor(id: number, needsSpacer: boolean) {
-    this._id = 'inputBox' + id.toString();
+    this._id = id;
+    this._domId = 'inputBox' + id.toString();
     this._needsSpacer = needsSpacer;
   }
 
@@ -164,7 +154,14 @@ class InputBox {
   }
 
   focusOnElement() {
-    (document.getElementById(this._id) as HTMLInputElement).focus();
+    (document.getElementById(this._domId) as HTMLInputElement).focus();
+  }
+
+  private focusOnNextElemtIfItExists() {
+    let inputElement: HTMLInputElement = document.getElementById('inputBox' + (this._id + 1).toString()) as HTMLInputElement;
+    if (inputElement) {
+      inputElement.focus();
+    }
   }
 
   get value(): string {
@@ -173,5 +170,8 @@ class InputBox {
 
   set value(value: string) {
     this._value = value.toUpperCase();
+    if (value && value.length > 0) {
+      this.focusOnNextElemtIfItExists();
+    }
   }
 }
