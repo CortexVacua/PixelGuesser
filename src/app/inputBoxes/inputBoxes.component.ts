@@ -12,6 +12,8 @@ import { throwError } from 'rxjs';
 })
 
 export class InputBoxesComponent implements OnInit {
+  static readonly pgGreen: string = '#9dfab8';
+  static readonly pgRed: string = '#fa8f87';
   readonly buzzer: HTMLAudioElement = new Audio();
   listOfSpacers: Array<number> = [];
   inputBoxes: Array<InputBox> = [];
@@ -38,9 +40,9 @@ export class InputBoxesComponent implements OnInit {
 
         if (doesCookieExistForToday) {
           if (parseInt(this.appComponent.getScoreIfItExists()!) > 0) {
-            this.inputBoxBgColor = '#9dfab8';
+            this.inputBoxBgColor = InputBoxesComponent.pgGreen;
           } else {
-            this.inputBoxBgColor = '#fa8f87';
+            this.inputBoxBgColor = InputBoxesComponent.pgRed;
           }
           this.showShareButton = true;
           this.filloutSolution();
@@ -55,7 +57,7 @@ export class InputBoxesComponent implements OnInit {
 
 
   }
-  private changeColorBackToWhiteAndUnlock() {
+  changeColorBackToWhiteAndUnlock() {
     this.isLocked = false;
     for (let inputBox of this.inputBoxes) {
       inputBox.value = '';
@@ -63,13 +65,11 @@ export class InputBoxesComponent implements OnInit {
     this.inputBoxBgColor = 'white';
   }
 
-  setGameOverIfNecessary(gameOver: boolean) {
-    if (gameOver) {
-      this.showShareButton = true;
-      this.filloutSolution();
-    } else {
-      this.changeColorBackToWhiteAndUnlock()
-    }
+  setGameOver() {
+    this.isLocked = true;
+    this.inputBoxBgColor = InputBoxesComponent.pgRed;
+    this.showShareButton = true;
+    this.filloutSolution();
   }
 
   processEnterAndBackspace(event: KeyboardEvent, index: number) {
@@ -78,7 +78,7 @@ export class InputBoxesComponent implements OnInit {
         this.commitGuess();
       } else if (event.key === 'Backspace' && (this.inputBoxes[index].value === '' || this.inputBoxes[index].value === null) && index > 0) {
         event.preventDefault();
-        this.inputBoxes[index - 1].value='';
+        this.inputBoxes[index - 1].value = '';
         this.inputBoxes[index - 1].focusOnElement();
       }
     }
@@ -96,7 +96,7 @@ export class InputBoxesComponent implements OnInit {
       .pipe(catchError(async (error) => this.handleError(error)))
       .subscribe((response: any) => {
         this.isLocked = true;
-        this.inputBoxBgColor = '#9dfab8';
+        this.inputBoxBgColor = InputBoxesComponent.pgGreen;
         this.messageEvent.emit(0);
         this.showShareButton = true;
       })
@@ -133,7 +133,7 @@ export class InputBoxesComponent implements OnInit {
 
   private startWrongGuessRoutine() {
     this.isLocked = true;
-    this.inputBoxBgColor = '#fa8f87';
+    this.inputBoxBgColor = InputBoxesComponent.pgRed;
     this.buzzer.play()
   }
 }

@@ -101,7 +101,9 @@ export class PlayGridComponent implements OnInit {
     } else if (event === this.wrongGuessOver) {
       this.scoreColor = 'black';
       this.locked = false;
-      this.checkIfGameOver();
+      if (!this.checkIfGameOver()) {
+        this.inputBoxes.changeColorBackToWhiteAndUnlock();
+      }
     }
   }
 
@@ -129,8 +131,11 @@ export class PlayGridComponent implements OnInit {
       ementsToSubdivideOrSolve.forEach((pixelElem) => {
         pixelElem.subDivideOrSolve(this.setOfPixelElements)
         this.clicks++;
-        let clonedAudio: HTMLAudioElement = this.popSound.cloneNode(true) as HTMLAudioElement;
-        clonedAudio.play();
+        if (!this.checkIfGameOver()) {
+          let clonedAudio: HTMLAudioElement = this.popSound.cloneNode(true) as HTMLAudioElement;
+          clonedAudio.play();
+        }
+
       })
     }
   }
@@ -157,12 +162,13 @@ export class PlayGridComponent implements OnInit {
     requestAnimationFrame(() => this.resolveAnimation(0, correct));
   }
 
-  private checkIfGameOver() {
+  private checkIfGameOver(): boolean {
     if (this.getScore() === '0') {
       this.resolve(false);
-      this.inputBoxes.setGameOverIfNecessary(true);
+      this.inputBoxes.setGameOver();
+      return true;
     } else {
-      this.inputBoxes.setGameOverIfNecessary(false);
+      return false;
     }
   }
 
