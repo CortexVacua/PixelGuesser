@@ -1,10 +1,12 @@
 <body>
     <div>
-        <h1 class="title"><span style="color: red">P</span>ixel<span style="color: red">G</span>uesser</h1>
+        <h1 [ngStyle]="{'color': isDarkThemeEnabled()? '#cecece':'black'}"><span style="color: red">P</span>ixel<span
+                style="color: red">G</span>uesser</h1>
     </div>
     <canvas #playCanvas width="1024" height="1024"></canvas>
     <div>
-        <h2 class="score">Score: <span [ngStyle]="{ 'color': scoreColor }">{{getScore()}}</span></h2>
+        <h2 class="score" [ngStyle]="{'color': isDarkThemeEnabled()? '#cecece':'black'}">Score: <span
+                [ngStyle]="{'color': getScoreNumberColor()}">{{getScore()}}</span></h2>
     </div>
     <app-inputBoxes #childComponent (messageEvent)="receiveMessage($event)"></app-inputBoxes>
 </body>

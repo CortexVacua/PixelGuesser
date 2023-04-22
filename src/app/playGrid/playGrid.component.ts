@@ -20,6 +20,7 @@ export class PlayGridComponent implements OnInit {
   readonly wrongGuess: number = 1;
   readonly wrongGuessOver: number = 2;
   locked: boolean = false;
+  shouldScoreBeRed: boolean = false;
 
   constructor(private http: HttpClient, private cookieService: CookieService, private appComponent: AppComponent) { };
   context2d: CanvasRenderingContext2D = null!;
@@ -32,7 +33,6 @@ export class PlayGridComponent implements OnInit {
   clicks: number = 0;
   wrongGuesses: number = 0;
 
-  scoreColor: string = 'black'
   readonly setOfPixelElements: Set<PixelElement> = new Set();
 
   ngOnInit(): void {
@@ -96,13 +96,13 @@ export class PlayGridComponent implements OnInit {
       this.resolve(true);
     } else if (event === this.wrongGuess) {
       this.wrongGuesses += 1;
-      this.scoreColor = 'red';
+      this.shouldScoreBeRed = true;
       this.locked = true;
     } else if (event === this.wrongGuessOver) {
-      this.scoreColor = 'black';
+      this.shouldScoreBeRed = false;
       this.locked = false;
       if (!this.checkIfGameOver()) {
-        this.inputBoxes.changeColorBackToWhiteAndUnlock();
+        this.inputBoxes.changeColorBackToDefaultAndUnlock();
       }
     }
   }
@@ -199,6 +199,20 @@ export class PlayGridComponent implements OnInit {
       this.cookieService.set(AppComponent.cookieGuesses, (this.wrongGuesses + 1).toString(), { expires: expiryDate });
     } else {
       this.cookieService.set(AppComponent.cookieGuesses, this.wrongGuesses.toString(), { expires: expiryDate });
+    }
+  }
+
+  isDarkThemeEnabled(): boolean {
+    return this.appComponent.isDarkThemeEnabled();
+  }
+
+  getScoreNumberColor(): string {
+    if (this.shouldScoreBeRed) {
+      return 'red';
+    } else if (this.isDarkThemeEnabled()) {
+      return '#cecece';
+    } else {
+      return 'black';
     }
   }
 }

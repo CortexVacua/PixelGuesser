@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -6,13 +6,30 @@ import { CookieService } from 'ngx-cookie-service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   static readonly cookieDate: string = 'PixelGuesserDate';
   static readonly cookieScore: string = 'PixelGuesserScore';
   static readonly cookieClicks: string = 'PixelGuesserClicks';
   static readonly cookieGuesses: string = 'PixelGuesserGuesses';
+  static readonly cookieDarkTheme: string = 'PixelGuesserDarkTheme';
+  static readonly backgroundBright: string = 'background-image';
+  static readonly backgroundDark: string = 'background-image-dark';
+
+  private _darkThemeEnabled: boolean = false;
 
   constructor(private cookieService: CookieService) { }
+
+  ngOnInit(): void {
+    let cookieDarkTheme: string = this.cookieService.get(AppComponent.cookieDarkTheme);
+    if (cookieDarkTheme) {
+      this.setToDarkTheme();
+    }
+  }
+
+  isDarkThemeEnabled(): boolean {
+    return this._darkThemeEnabled;
+  }
+
 
   static getDateAsStringPreformatted(): string {
     const currentDate: Date = new Date();
@@ -71,6 +88,40 @@ export class AppComponent {
     }
   }
 
+  changeTheme() {
+    if (this._darkThemeEnabled) {
+      this.setToBrightTheme();
+    } else {
+      this.setToDarkTheme();
+    }
+  }
+
+  private setToDarkTheme() {
+    this._darkThemeEnabled = true;
+    let body: HTMLBodyElement = document.getElementById('main-body') as HTMLBodyElement;
+    if (body && body.classList.contains(AppComponent.backgroundBright)) {
+      body.classList.remove(AppComponent.backgroundBright);
+      body.classList.add(AppComponent.backgroundDark)
+    }
+    let cookieDarkTheme: string = this.cookieService.get(AppComponent.cookieDarkTheme);
+    if (!cookieDarkTheme) {
+      this.cookieService.set(AppComponent.cookieDarkTheme, 'true', { expires: AppComponent.getDateInAMonth() });
+    }
+  }
+
+  private setToBrightTheme() {
+    this._darkThemeEnabled = false;
+    let body: HTMLBodyElement = document.getElementById('main-body') as HTMLBodyElement;
+    if (body && body.classList.contains(AppComponent.backgroundDark)) {
+      body.classList.remove(AppComponent.backgroundDark);
+      body.classList.add(AppComponent.backgroundBright)
+    }
+    let cookieDarkTheme: string = this.cookieService.get(AppComponent.cookieDarkTheme);
+    if (cookieDarkTheme) {
+      this.cookieService.delete(AppComponent.cookieDarkTheme);
+    }
+  }
+
   private isUserOnMobile(): boolean {
     if (navigator.userAgent.match(/Android/i)
       || navigator.userAgent.match(/webOS/i)
@@ -83,6 +134,12 @@ export class AppComponent {
     } else {
       return false;
     }
+  }
+
+  private static getDateInAMonth() {
+    const date = new Date();
+    date.setDate(date.getDate() + 30);
+    return date;
   }
 
   informAboutResultsBeingCopiedToClipBoard() {
@@ -103,4 +160,10 @@ export class AppComponent {
     }, 2000);
   }
 
+  getSourceForLightBulb(): string {
+    if (this._darkThemeEnabled) {
+      return 'assets/LightBulbWhite.svg';
+    }
+    return 'assets/LightBulb.svg';
+  }
 }

@@ -1,0 +1,13 @@
+.theme-button {
+    position: fixed;
+    left: 1vh;
+    bottom: 1vh;
+    background-color: transparent;
+    height:5vh;
+    width:5vh;
+    border: none;
+}
+
+.light-bulb {
+    height: 5vh;
+}

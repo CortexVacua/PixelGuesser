@@ -1,5 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
 @font-face {
-    font-family: 'PublicPixel';
-    src: url('assets/PublicPixel-z84yD.ttf');
-  }
+  font-family: 'PublicPixel';
+  src: url('assets/PublicPixel-z84yD.ttf');
+}
+
+.background-image{
+  background-image: url('assets/PixelGuesserBackGround.jpg');
+  background-size: cover;
+}
+
+.background-image-dark{
+  background-image: url('assets/PixelGuesserBackGround-Dark.jpg');
+  background-size: cover;
+}

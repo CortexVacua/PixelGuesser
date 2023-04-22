@@ -12,14 +12,14 @@ import { throwError } from 'rxjs';
 })
 
 export class InputBoxesComponent implements OnInit {
-  static readonly pgGreen: string = '#9dfab8';
-  static readonly pgRed: string = '#fa8f87';
+  static readonly pgGreen: string = '#058026';
+  static readonly pgRed: string = '#bf1502';
   readonly buzzer: HTMLAudioElement = new Audio();
   listOfSpacers: Array<number> = [];
   inputBoxes: Array<InputBox> = [];
   isLocked: boolean = false;
   showShareButton: boolean = false;
-  inputBoxBgColor: string = 'white';
+  inputBoxBgColor: string = 'transparent';
 
   constructor(private http: HttpClient, private appComponent: AppComponent) { }
 
@@ -57,12 +57,16 @@ export class InputBoxesComponent implements OnInit {
 
 
   }
-  changeColorBackToWhiteAndUnlock() {
+  changeColorBackToDefaultAndUnlock() {
     this.isLocked = false;
     for (let inputBox of this.inputBoxes) {
       inputBox.value = '';
     }
-    this.inputBoxBgColor = 'white';
+    this.inputBoxBgColor = 'transparent';
+  }
+
+  isDarkThemeEnabled(): boolean {
+    return this.appComponent.isDarkThemeEnabled();
   }
 
   setGameOver() {
