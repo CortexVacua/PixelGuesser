@@ -1,7 +1,7 @@
 <body>
     <div>
-        <h1 [ngStyle]="{'color': isDarkThemeEnabled()? '#cecece':'black'}"><span style="color: red">P</span>ixel<span
-                style="color: red">G</span>uesser</h1>
+        <h1 class="title" [ngStyle]="{'color': isDarkThemeEnabled()? '#cecece':'black'}"><span
+                style="color: red">P</span>ixel<span style="color: red">G</span>uesser</h1>
     </div>
     <canvas #playCanvas width="1024" height="1024"></canvas>
     <div>
