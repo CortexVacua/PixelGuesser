@@ -131,7 +131,7 @@ export class PlayGridComponent implements OnInit {
       ementsToSubdivideOrSolve.forEach((pixelElem) => {
         pixelElem.subDivideOrSolve(this.setOfPixelElements)
         this.clicks++;
-        if (!this.checkIfGameOver()) {
+        if (!this.checkIfGameOver() && this.appComponent.isVolumeOn()) {
           let clonedAudio: HTMLAudioElement = this.popSound.cloneNode(true) as HTMLAudioElement;
           clonedAudio.play();
         }
@@ -153,10 +153,12 @@ export class PlayGridComponent implements OnInit {
 
   private resolve(correct: boolean) {
     this.setOfPixelElements.clear();
-    if (correct) {
-      this.correctSound.play();
-    } else {
-      this.failSound.play();
+    if (this.appComponent.isVolumeOn()) {
+      if (correct) {
+        this.correctSound.play();
+      } else {
+        this.failSound.play();
+      }
     }
     this.setCookies();
     requestAnimationFrame(() => this.resolveAnimation(0, correct));
@@ -183,7 +185,7 @@ export class PlayGridComponent implements OnInit {
     } else {
       this.correctSound.pause();
       this.correctSound.currentTime = 0;
-      if (correct) {
+      if (correct && this.appComponent.isVolumeOn()) {
         this.pingSound.play();
       }
     }

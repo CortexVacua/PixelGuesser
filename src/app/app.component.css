@@ -1,13 +1,20 @@
-.theme-button {
+.icon {
     position: fixed;
-    left: 1vh;
     bottom: 1vh;
     background-color: transparent;
-    height:5vh;
-    width:5vh;
+    height: 5vh;
+    width: 5vh;
     border: none;
 }
 
-.light-bulb {
+.left {
+    left: 1vh;
+}
+
+.right {
+    right: 3vh;
+}
+
+.icon-svg {
     height: 5vh;
 }

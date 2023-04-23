@@ -135,10 +135,22 @@ export class InputBoxesComponent implements OnInit {
     this.appComponent.shareResults();
   }
 
-  private startWrongGuessRoutine() {
+  private async startWrongGuessRoutine() {
     this.isLocked = true;
     this.inputBoxBgColor = InputBoxesComponent.pgRed;
-    this.buzzer.play()
+    if (this.appComponent.isVolumeOn()) {
+      this.buzzer.play()
+    } else {
+      // wait for roughly the same time the buzzer would take and then emit wrongGuessOver message
+      await this.delay(500);
+      this.messageEvent.emit(2);
+    }
+  }
+
+  delay(milliseconds:number) {
+    return new Promise(resolve => {
+      setTimeout(resolve, milliseconds);
+    });
   }
 }
 

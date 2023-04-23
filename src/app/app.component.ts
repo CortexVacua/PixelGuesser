@@ -12,10 +12,12 @@ export class AppComponent implements OnInit {
   static readonly cookieClicks: string = 'PixelGuesserClicks';
   static readonly cookieGuesses: string = 'PixelGuesserGuesses';
   static readonly cookieDarkTheme: string = 'PixelGuesserDarkTheme';
+
   static readonly backgroundBright: string = 'background-image';
   static readonly backgroundDark: string = 'background-image-dark';
 
   private _darkThemeEnabled: boolean = false;
+  private _volumeOn: boolean = true;
 
   constructor(private cookieService: CookieService) { }
 
@@ -30,6 +32,13 @@ export class AppComponent implements OnInit {
     return this._darkThemeEnabled;
   }
 
+  changeVolume() {
+    this._volumeOn = !this._volumeOn;
+  }
+
+  isVolumeOn(): boolean {
+    return this._volumeOn;
+  }
 
   static getDateAsStringPreformatted(): string {
     const currentDate: Date = new Date();
@@ -160,10 +169,7 @@ export class AppComponent implements OnInit {
     }, 2000);
   }
 
-  getSourceForLightBulb(): string {
-    if (this._darkThemeEnabled) {
-      return 'assets/LightBulbWhite.svg';
-    }
-    return 'assets/LightBulb.svg';
+  getFilterToWhite(): string {
+    return 'invert(81%) sepia(0%) saturate(69%) hue-rotate(144deg) brightness(103%) contrast(91%)';
   }
 }
