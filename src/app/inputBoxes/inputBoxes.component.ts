@@ -35,11 +35,12 @@ export class InputBoxesComponent implements OnInit {
           this.inputBoxes[i] = new InputBox(i, this.listOfSpacers.includes(i) ? true : false);
         }
 
-        let doesCookieExistForToday: boolean = this.appComponent.doesCookieExistForToday();
-        this.isLocked = doesCookieExistForToday;
+        let wasAlreadyPlayedToday: boolean = AppComponent.wasAlreadyPlayedToday();
+        let guessedRight: boolean = localStorage.getItem(AppComponent.keyGuessedRight) === 'true';
+        this.isLocked = wasAlreadyPlayedToday;
 
-        if (doesCookieExistForToday) {
-          if (parseInt(this.appComponent.getScoreIfItExists()!) > 0) {
+        if (wasAlreadyPlayedToday) {
+          if (guessedRight) {
             this.inputBoxBgColor = InputBoxesComponent.pgGreen;
           } else {
             this.inputBoxBgColor = InputBoxesComponent.pgRed;
@@ -147,7 +148,7 @@ export class InputBoxesComponent implements OnInit {
     }
   }
 
-  delay(milliseconds:number) {
+  delay(milliseconds: number) {
     return new Promise(resolve => {
       setTimeout(resolve, milliseconds);
     });

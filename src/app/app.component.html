@@ -1,5 +1,5 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-<app-playGrid></app-playGrid>
+<app-playGrid #playGrid></app-playGrid>
 <button class="icon left" (click)="changeTheme()">
     <img class="icon-svg" src="assets/LightBulb.svg"
         [ngStyle]="{'filter': isDarkThemeEnabled()? getFilterToWhite():''}" />

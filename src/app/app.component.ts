@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { CookieService } from 'ngx-cookie-service';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { PlayGridComponent } from './playGrid/playGrid.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -7,11 +8,16 @@ import { CookieService } from 'ngx-cookie-service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  static readonly cookieDate: string = 'PixelGuesserDate';
-  static readonly cookieScore: string = 'PixelGuesserScore';
-  static readonly cookieClicks: string = 'PixelGuesserClicks';
-  static readonly cookieGuesses: string = 'PixelGuesserGuesses';
-  static readonly cookieDarkTheme: string = 'PixelGuesserDarkTheme';
+  @ViewChild('playGrid', { static: false }) playGrid!: PlayGridComponent;
+
+  static readonly keyDatePlayed: string = 'PixelGuesserDate';
+  static readonly keyClicks: string = 'PixelGuesserClicks';
+  static readonly keyWrongGuesses: string = 'PixelGuesserWrongGuesses';
+  static readonly keyGuessedRight: string = 'PixelGuesserGuessedRight';
+  static readonly keyStillPlaying: string = 'PixelGuesserStillPlaying';
+  static readonly keyImgData: string = 'PixelGuesserImgData';
+  static readonly keyPixelElems: string = 'PixelGuesserPixelElems';
+  static readonly keyDarkTheme: string = 'PixelGuesserDarkTheme';
 
   static readonly backgroundBright: string = 'background-image';
   static readonly backgroundDark: string = 'background-image-dark';
@@ -19,13 +25,18 @@ export class AppComponent implements OnInit {
   private _darkThemeEnabled: boolean = false;
   private _volumeOn: boolean = true;
 
-  constructor(private cookieService: CookieService) { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
-    let cookieDarkTheme: string = this.cookieService.get(AppComponent.cookieDarkTheme);
+    let cookieDarkTheme: string = localStorage.getItem(AppComponent.keyDarkTheme)!;
     if (cookieDarkTheme) {
       this.setToDarkTheme();
     }
+
+    window.addEventListener('focus', () => {
+      // Navigate to the current route again
+      this.router.navigate([this.router.url]);
+    });
   }
 
   isDarkThemeEnabled(): boolean {
@@ -48,38 +59,36 @@ export class AppComponent implements OnInit {
     return year + '-' + month + '-' + day;
   }
 
-  doesCookieExistForToday(): boolean {
-    let cookieDateValue: string = this.cookieService.get(AppComponent.cookieDate);
-    if (cookieDateValue && cookieDateValue === AppComponent.getDateAsStringPreformatted()) {
+  static wasAlreadyPlayedToday(): boolean {
+    let dateLastPlayed: string = localStorage.getItem(AppComponent.keyDatePlayed)!;
+    let stillPlayingAsString: string = localStorage.getItem(AppComponent.keyStillPlaying)!;
+    if (dateLastPlayed && dateLastPlayed === AppComponent.getDateAsStringPreformatted() && stillPlayingAsString && stillPlayingAsString === 'false' && localStorage.getItem(AppComponent.keyClicks) && localStorage.getItem(AppComponent.keyWrongGuesses) && localStorage.getItem(AppComponent.keyGuessedRight)) {
       return true;
     } else {
       return false;
     }
   }
 
-  getScoreIfItExists(): string | null {
-    if (this.doesCookieExistForToday()) {
-      let cookieScoreValue: string = this.cookieService.get(AppComponent.cookieScore);
-      if (cookieScoreValue) {
-        return cookieScoreValue;
-      } else {
-        return '0';
-      }
+  static isTodaysGameCurrentlyOngoing(): boolean {
+    let dateLastPlayed: string = localStorage.getItem(AppComponent.keyDatePlayed)!;
+    let stillPlayingAsString: string = localStorage.getItem(AppComponent.keyStillPlaying)!;
+    if (dateLastPlayed && dateLastPlayed === AppComponent.getDateAsStringPreformatted() && stillPlayingAsString && stillPlayingAsString === 'true' && localStorage.getItem(AppComponent.keyClicks) && localStorage.getItem(AppComponent.keyWrongGuesses) && localStorage.getItem(AppComponent.keyImgData) && localStorage.getItem(AppComponent.keyPixelElems)) {
+      return true;
     } else {
-      return null;
+      return false;
     }
   }
 
   shareResults() {
-    let shareString = 'Daily PixelGuesser [' + this.cookieService.get(AppComponent.cookieDate) + ']: \n\n';
-    let score: string = this.cookieService.get(AppComponent.cookieScore);
+    let shareString = 'Daily PixelGuesser [' + localStorage.getItem(AppComponent.keyDatePlayed) + ']: \n\n';
+    let score: string = this.playGrid.getScore();
     if (parseInt(score) > 0) {
       shareString = shareString.concat('✅[Score]:\t\t' + score + '\n');
     } else {
       shareString = shareString.concat('❌[Score]:\t\t' + score + '\n');
     }
-    shareString = shareString.concat('👆[Clicks]:\t\t' + this.cookieService.get(AppComponent.cookieClicks) + '\n');
-    shareString = shareString.concat('❔[Guesses]:\t\t' + this.cookieService.get(AppComponent.cookieGuesses) + '\n\n');
+    shareString = shareString.concat('👆[Clicks]:\t\t' + localStorage.getItem(AppComponent.keyClicks) + '\n');
+    shareString = shareString.concat('❔[Guesses]:\t\t' + localStorage.getItem(AppComponent.keyWrongGuesses) + '\n\n');
     shareString = shareString.concat('If you want to play PixelGuesser, check it out here: ' + document.location.href)
 
 
@@ -112,9 +121,9 @@ export class AppComponent implements OnInit {
       body.classList.remove(AppComponent.backgroundBright);
       body.classList.add(AppComponent.backgroundDark)
     }
-    let cookieDarkTheme: string = this.cookieService.get(AppComponent.cookieDarkTheme);
-    if (!cookieDarkTheme) {
-      this.cookieService.set(AppComponent.cookieDarkTheme, 'true', { expires: AppComponent.getDateInAMonth() });
+    let localStorageDarkTheme: string = localStorage.getItem(AppComponent.keyDarkTheme)!;
+    if (!localStorageDarkTheme) {
+      localStorage.setItem(AppComponent.keyDarkTheme, 'true');
     }
   }
 
@@ -125,9 +134,9 @@ export class AppComponent implements OnInit {
       body.classList.remove(AppComponent.backgroundDark);
       body.classList.add(AppComponent.backgroundBright)
     }
-    let cookieDarkTheme: string = this.cookieService.get(AppComponent.cookieDarkTheme);
-    if (cookieDarkTheme) {
-      this.cookieService.delete(AppComponent.cookieDarkTheme);
+    let localStorageDarkTheme: string = localStorage.getItem(AppComponent.keyDarkTheme)!;
+    if (localStorageDarkTheme) {
+      localStorage.removeItem(AppComponent.keyDarkTheme);
     }
   }
 
@@ -171,5 +180,14 @@ export class AppComponent implements OnInit {
 
   getFilterToWhite(): string {
     return 'invert(81%) sepia(0%) saturate(69%) hue-rotate(144deg) brightness(103%) contrast(91%)';
+  }
+
+  private getTotalGuessesFromLocalStorage(): number {
+    let wrongGuesses: number = parseInt(localStorage.getItem(AppComponent.keyWrongGuesses)!);
+    if (Boolean(localStorage.getItem(AppComponent.keyGuessedRight)!)) {
+      return wrongGuesses + 1;
+    } else {
+      return wrongGuesses;
+    }
   }
 }
