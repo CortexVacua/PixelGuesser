@@ -1,14 +1,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <app-playGrid #playGrid></app-playGrid>
 <button class="icon left" (click)="changeTheme()">
-    <img class="icon-svg" src="assets/LightBulb.svg"
+    <img class="icon-svg" src="assets/LightBulb.svg" alt=""
         [ngStyle]="{'filter': isDarkThemeEnabled()? getFilterToWhite():''}" />
 </button>
 <button class="icon right" (click)="changeVolume()" *ngIf="isVolumeOn()">
-    <img class="icon-svg" src="assets/VolumeOn.svg"
+    <img class="icon-svg" src="assets/VolumeOn.svg" alt=""
         [ngStyle]="{'filter': isDarkThemeEnabled()? getFilterToWhite():''}" />
 </button>
 <button class="icon right" (click)="changeVolume()" *ngIf="!isVolumeOn()">
-    <img class="icon-svg" src="assets/VolumeOff.svg"
+    <img class="icon-svg" src="assets/VolumeOff.svg" alt=""
         [ngStyle]="{'filter': isDarkThemeEnabled()? getFilterToWhite():''}" />
 </button>

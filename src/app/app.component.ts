@@ -88,7 +88,7 @@ export class AppComponent implements OnInit {
       shareString = shareString.concat('❌[Score]:\t\t' + score + '\n');
     }
     shareString = shareString.concat('👆[Clicks]:\t\t' + localStorage.getItem(AppComponent.keyClicks) + '\n');
-    shareString = shareString.concat('❔[Guesses]:\t\t' + localStorage.getItem(AppComponent.keyWrongGuesses) + '\n\n');
+    shareString = shareString.concat('❔[Guesses]:\t\t' + AppComponent.getTotalGuessesFromLocalStorage().toString() + '\n\n');
     shareString = shareString.concat('If you want to play PixelGuesser, check it out here: ' + document.location.href)
 
 
@@ -182,9 +182,9 @@ export class AppComponent implements OnInit {
     return 'invert(81%) sepia(0%) saturate(69%) hue-rotate(144deg) brightness(103%) contrast(91%)';
   }
 
-  private getTotalGuessesFromLocalStorage(): number {
+  private static getTotalGuessesFromLocalStorage(): number {
     let wrongGuesses: number = parseInt(localStorage.getItem(AppComponent.keyWrongGuesses)!);
-    if (Boolean(localStorage.getItem(AppComponent.keyGuessedRight)!)) {
+    if (localStorage.getItem(AppComponent.keyGuessedRight) === 'true') {
       return wrongGuesses + 1;
     } else {
       return wrongGuesses;
