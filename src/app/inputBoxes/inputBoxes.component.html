@@ -2,7 +2,7 @@
     <ng-container *ngFor="let inBox of inputBoxes; let i = index">
         <input type=text
             [ngStyle]="{ 'background-color': inputBoxBgColor , 'color': isDarkThemeEnabled()? '#cecece':'black'}"
-            class="inputBox" id="{{'inputBox'+i}}" maxlength="1" [readOnly]="isLocked"
+            class="inputBox" id="{{'inputBox'+i}}" maxlength="1" [disabled]="isLocked"
             (keydown)="processEnterAndBackspace($event, i)" [(ngModel)]="inputBoxes[i].value">
         <div *ngIf="inBox.needsSpacer()" class="spacer"></div>
     </ng-container>
